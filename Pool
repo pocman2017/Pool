@@ -1,0 +1,168 @@
+char racketPlace(int c, int coord);
+char ballPlace(int i, int j, int x, int y);
+int ballMovementX(int ballx, int stepx, int limit1, int limit2, int bally1, int player1y, int player2y);
+int ballMovementY(int bally, int stepy);
+
+int main() {
+    // start conditions
+	int FieldSizeX = 80;
+	int FieldSizeY = 25;
+	int score1 = 0;
+	int score2 = 0;
+
+	char field[FieldSizeY][FieldSizeX];
+
+	int player1x = 5;  // DON'T CHANGE!
+	int player1y = 12;
+	int player2x = 75;  // DON'T CHANGE!
+	int player2y = 12;
+
+	int ballx = 6;
+	int bally = 12;
+	int stepx = 1;
+	int stepy = -1;
+
+	int limit1 = 0;
+	int limit2 = FieldSizeX;
+
+	char key = ' ';
+
+    printf("Press any key to start:\n");
+
+	while((key != 'q') && (key != 'E')) {
+		printf("Player1:%d, Player:%d\n", score1, score2);
+		stepx = ballMovementX(stepx, ballx, player1x, player2x, bally, player1y, player2y);
+		stepy = ballMovementY(stepy, bally);
+		key = getchar();
+		switch (key) {
+			case('\n'):
+				continue;
+				break;
+			case('s'):
+				break;
+			case('a'):
+				if (player1y == 1) {
+					player1y = player1y;
+				} else {
+					player1y = player1y - 1;
+				}
+				break;
+			case('z'):
+				if (player1y > 22) {
+					player1y = player1y;
+				} else {
+					player1y = player1y + 1;
+				}
+				break;
+			case('k'):
+				if (player2y <= 1) {
+					player2y = player2y;
+				} else {
+					player2y = player2y - 1;
+				}
+				break;
+			case('m'):
+				if (player2y >= 22) {
+					player2y = player2y;
+				} else {
+					player2y = player2y + 1;
+				}
+				break;
+			default:
+				break;
+		}
+		// calculating field state
+		if (ballx >= 78) {
+			score1++;
+			ballx = player2x - 1;
+			bally = 12;
+			player1y = 12;
+			player2y = 12;
+			stepx = -1;
+		}
+		if (ballx <= 2) {
+			score2++;
+			ballx = player1x + 1;
+			bally = 12;
+			player1y = 12;
+			player2y = 12;
+			stepx = 1;
+		}
+
+		if (score1 == 21) {
+			printf("Player 1 Win!");
+			break;
+		}
+
+		if (score2 == 21) {
+			printf("Player 2 Win!");
+			break;
+		}
+
+
+		ballx = ballx + stepx;
+		bally = bally + stepy;
+
+		for (int i = 0; i < FieldSizeY; i++) {
+			for (int j = 0; j < FieldSizeX; j++) {
+				field[i][40] = '|';
+				field[i][j] = ballPlace(i, j, ballx, bally);
+
+				field[i][player1x] = racketPlace(player1y, i);
+				field[i][player2x] = racketPlace(player2y, i);
+			}
+		}
+
+	// on-screen
+		for (int i = 0; i <25; i++) {
+			for (int j = 0; j < 80; j++) {
+				printf("%c", field[i][j]);
+				field[i][j] = ' ';
+			}
+			printf("\n");
+		}
+	}
+
+	printf("Finish!");
+
+	return 0;
+}
+
+char racketPlace(int center, int i) {
+	if ((i >= (center - 1)) && (i <= (center + 1))) {
+		return '|';
+	}
+	return ' ';
+}
+
+char ballPlace(int i, int j, int x, int y) {
+	if((i == y) && (j == x)) {
+		return 'O';
+	}
+	return ' ';
+}
+
+
+int ballMovementX(int stepx, int ballx1, int limit1, int limit2, int bally1, int player1y, int player2y) {
+		if (ballx1 <= limit1) {
+			if ((bally1 <= (player1y + 1)) && (bally1 >= (player1y - 1))) {
+				stepx = 1;
+			}
+		}
+		if (ballx1 >= limit2) {
+			if ((bally1 <= (player2y + 1)) && (bally1 >= (player2y - 1))) {
+				stepx = -1;
+			}
+		}
+	return stepx;
+}
+
+int ballMovementY(int stepy, int bally1) {
+	if (bally1 == 1) {
+		stepy = 1;
+	}
+	if (bally1 == 24) {
+		stepy = -1;
+	}
+	return stepy;
+}
